@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
     int currentQuest = 1;
 
     //First Quest -> Press W to jump
@@ -13,6 +15,15 @@ public class GameManager : MonoBehaviour
     int jumpNumber = 5;
 
     //Third Quest => Collect 7 berries
+    [SerializeField] GameObject heartsHolder;
+    int heartsCollected = 0;
+    int totalHearts = 7;
+
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Update()
     {
@@ -20,6 +31,8 @@ public class GameManager : MonoBehaviour
             FirstQuest();
         else if (currentQuest == 2)
             SecondQuest();
+        else if (currentQuest == 3)
+            ThirdQuest();
     }
 
     private void FirstQuest()
@@ -29,6 +42,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Pressing W or 'jump'");
             currentWPressCount++;
             NotificationManager.Instance.CompleteQuest(currentWPressCount);
+            HintManager.Instance.HintCompleted();
             currentQuest++;
         }
     }
@@ -43,9 +57,35 @@ public class GameManager : MonoBehaviour
             if (currentWPressCount == jumpNumber)
             {
                 Debug.Log($"Pressing W or 'jump' for {jumpNumber} time");
-                NotificationManager.Instance.CompleteQuest();
+                NotificationManager.Instance.CompleteQuest(heartsCollected);
                 currentQuest++;
             }
+        }
+    }
+
+    private void ThirdQuest()
+    {
+        if (!heartsHolder.activeSelf)
+        {
+            heartsHolder.SetActive(true);
+            HintManager.Instance.ShowCurrentHint();
+        }
+    }
+
+    public void HeartCollected()
+    {
+        Debug.Log($"Hearts Collected");
+        heartsCollected++;
+        NotificationManager.Instance.ShowCurrentNotification(heartsCollected);
+
+        if(heartsCollected == 3)
+            HintManager.Instance.HintCompleted();
+
+        if (heartsCollected == totalHearts)
+        {
+            Debug.Log($"{heartsCollected} hearts collected!");
+            NotificationManager.Instance.CompleteQuest();
+            currentQuest++;
         }
     }
 }

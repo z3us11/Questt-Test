@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class NotificationUI : MonoBehaviour
 {
-    [SerializeField] Transform notificationPanel;
+    [SerializeField] RectTransform notificationPanel;
     [SerializeField] TMP_Text headerTxt;
     [SerializeField] TMP_Text descriptionTxt;
     [SerializeField] GameObject countPanel;
@@ -28,6 +29,8 @@ public class NotificationUI : MonoBehaviour
     public void ShowNotification(string _headetText, string _descriptionText, int count = 0)
     {
         notificationPanel.gameObject.SetActive(true);
+        notificationPanel.anchoredPosition = new Vector2(-600, -200);
+        notificationPanel.DOAnchorPosX(0, 0.25f);
 
         currentHeaderTxt= _headetText;
         currentDescriptionTxt= _descriptionText;
@@ -51,9 +54,19 @@ public class NotificationUI : MonoBehaviour
         showBtn.onClick.AddListener(()=>HideNotification());
     }
 
-    public void HideNotification()
+    public void HideNotification(bool completed = false)
     {
-        notificationPanel.gameObject.SetActive(false);
+        notificationPanel.DOAnchorPosX(-600, 0.25f).OnComplete(()=>
+        {
+            notificationPanel.gameObject.SetActive(false);
+        });
+
+        if (completed)
+        {
+            currentHeaderTxt = "No Active Quest";
+            currentDescriptionTxt = "";
+            currentCount = 0;
+        }
 
         showBtn.onClick.AddListener(()=>ShowNotification(currentHeaderTxt, currentDescriptionTxt, currentCount));
     }
@@ -61,11 +74,17 @@ public class NotificationUI : MonoBehaviour
     public void ShowQuestCompletedNotification()
     {
         questCompletedPanel.SetActive(true);
+        questCompletedPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(-500, -450);
+        questCompletedPanel.GetComponent<RectTransform>().DOAnchorPosX(0, 0.25f);
+
         Invoke(nameof(HideQuestCompletedNotification), 1f);
     }
 
     void HideQuestCompletedNotification()
     {
-        questCompletedPanel.SetActive(false);
+        questCompletedPanel.GetComponent<RectTransform>().DOAnchorPosX(-500, 0.25f).OnComplete(()=>
+        {
+            questCompletedPanel.SetActive(false);
+        });
     }
 }

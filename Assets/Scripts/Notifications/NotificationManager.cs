@@ -39,11 +39,16 @@ public class NotificationManager : MonoBehaviour
 
     public void ShowCurrentNotification(int count = 0)
     { 
-        Debug.Log($"Showing {currentNotification} Notification | Count : {count}");
         if(CurrentNotification < notifications.Length)
         {
+            Debug.Log($"Showing {currentNotification} Notification | Count : {count}");
+            currentNotificationQuestCount = count;
             var notification = notifications[CurrentNotification];
             notificationUIScript.ShowNotification(notification.notificationHeader, notification.notificationDescription, notification.itemCount - count);
+        }
+        else
+        {
+            notificationUIScript.HideNotification(completed: true);
         }
     }
 
